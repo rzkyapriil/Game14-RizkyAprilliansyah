@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] Player player;
     // public GameObject SettingsMenu;
     [SerializeField] GameObject grass;
     [SerializeField] GameObject road;
@@ -31,6 +32,7 @@ public class GameManager : MonoBehaviour
             //instantiative blocknya
             CreateTerrain(prefab, z);
         }
+        player.SetUp(minZPos, extent);
     }
 
     private void CreateTerrain(GameObject prefab, int zPos)
