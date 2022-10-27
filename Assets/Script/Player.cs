@@ -2,9 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using TMPro;
 
 public class Player : MonoBehaviour
 {
+    [SerializeField] TMP_Text stepText;
+    [SerializeField] ParticleSystem dieParticles;
     [SerializeField, Range(0.01f, 1f)] float moveDuration = 0.2f;
     [SerializeField, Range(0.01f, 1f)] float jumpHeight = 0.8f;
     private int minZPos;
@@ -12,6 +15,13 @@ public class Player : MonoBehaviour
     private float backBoundary;
     private float leftBoundary;
     private float rightBoundary;
+
+    [SerializeField] private int maxTravel;
+    [SerializeField] private int currentTravel;
+
+    public int MaxTravel {get => maxTravel;}
+    public int CurrentTravel {get => currentTravel;}
+    public bool IsDie {get => this.enabled == false;}
 
     public void SetUp(int minZPos, int extent)
     {
@@ -74,8 +84,17 @@ public class Player : MonoBehaviour
         
         // gerak maju/mundur/samping
         transform.DOMoveX(targetPosition.x, moveDuration);
-        transform.DOMoveZ(targetPosition.z, moveDuration);
-        // transform.DORotate(targetRotateDirection, moveDuration/2);
+        transform.DOMoveZ(targetPosition.z, moveDuration).OnComplete(UpdateTravel);
+    }
+
+    private void UpdateTravel()
+    {
+        currentTravel = (int) this.transform.position.z;
+
+        if(currentTravel > maxTravel)
+            maxTravel = currentTravel;
+        
+        stepText.text = "STEP:" + maxTravel.ToString();
     }
 
     private bool isJumping()
@@ -85,19 +104,27 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Car")
-        {
-            AnimateDie();
-        }
+        if(this.enabled==false)
+            return;
+
+        var car = other.GetComponent<Car>();
+
+        if(car != null)
+            AnimateCrash(car);
+
+        // if(other.tag == "Car") {}
+            // AnimateDie(car);
         
     }
 
-    private void AnimateDie()
+    private void AnimateCrash(Car car)
     {
         transform.DOScaleY(0.1f, 1);
         transform.DOScaleX(2, 1);
         transform.DOScaleZ(2, 1);
+
         this.enabled = false;
+        dieParticles.Play();
     }
 
     private void OnTriggerStay(Collider other)

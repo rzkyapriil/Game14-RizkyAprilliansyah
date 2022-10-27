@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -7,32 +8,70 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] Player player;
+    [SerializeField] GameObject gameOverPanel;
     // public GameObject SettingsMenu;
     [SerializeField] GameObject grass;
     [SerializeField] GameObject road;
-    [SerializeField] int extent;
+    [SerializeField] int extent = 7;
     [SerializeField] int frontDistance = 10;
-    [SerializeField] int minZPos = -5;
+    [SerializeField] int backDistance = -5;
     [SerializeField] int maxSameTerrainRepeat = 3;
 
     Dictionary<int, TerrainBlock> map = new Dictionary<int, TerrainBlock>(50);
-
+    TMP_Text gameOverText;
     private void Start()
     {
+        // setup gameover panel
+        gameOverPanel.SetActive(false);
+        gameOverText = gameOverPanel.GetComponentInChildren<TMP_Text>();
+
         //belakang
-        for(int z=minZPos; z<=0; z++)
+        for(int z=backDistance; z<=0; z++)
         {
             CreateTerrain(grass, z);
         }
 
-        for(int z=1; z<frontDistance; z++)
+        for(int z=1; z<=frontDistance; z++)
         {
             var prefab = GetNextRandomTerrainPrefab(z);
 
             //instantiative blocknya
             CreateTerrain(prefab, z);
         }
-        player.SetUp(minZPos, extent);
+        player.SetUp(backDistance, extent);
+    }
+
+    private int playerLastMaxTravel;
+    private void Update()
+    {
+        Debug.Log(player.MaxTravel+frontDistance);
+        // cek player
+        if(player.IsDie && gameOverPanel.activeInHierarchy==false)
+            ShowGameOverPanel();
+        
+        // infinite terrain system
+        if(player.MaxTravel == playerLastMaxTravel)
+            return;
+
+        playerLastMaxTravel = player.MaxTravel;
+
+        // membuat blok depan
+        var randTbPrefab = GetNextRandomTerrainPrefab(player.MaxTravel+frontDistance);
+        CreateTerrain(randTbPrefab, player.MaxTravel+frontDistance);
+
+        // menghapus blok belakang
+        var lastTB = map[player.MaxTravel-1+backDistance];
+
+        map.Remove(player.MaxTravel-1+backDistance);
+        Destroy(lastTB.gameObject);
+
+        player.SetUp(player.MaxTravel+backDistance, extent);
+    }
+
+    void ShowGameOverPanel()
+    {
+        gameOverText.text = "Your Score: " + player.MaxTravel;
+        gameOverPanel.SetActive(true);
     }
 
     private void CreateTerrain(GameObject prefab, int zPos)

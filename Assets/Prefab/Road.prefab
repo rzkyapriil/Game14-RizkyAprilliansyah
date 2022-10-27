@@ -190,7 +190,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31f920655a2971f40b89165d0d0f65ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  carPrefab: {fileID: 7746908202611247393, guid: 3528bf66478c4c24493e073d54e3eef3, type: 3}
+  carPrefab: {fileID: 5044544731156166181, guid: 3528bf66478c4c24493e073d54e3eef3, type: 3}
   terrain: {fileID: -802400890700582258}
   minSpawnDuration: 2
   maxSpawnDuration: 4
