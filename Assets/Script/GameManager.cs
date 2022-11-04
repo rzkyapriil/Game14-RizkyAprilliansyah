@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
     TMP_Text gameOverText;
     private void Start()
     {
+        FindObjectOfType<AudioManager>().PlayAudio("CarAmbience");
+
         // setup gameover panel
         gameOverPanel.SetActive(false);
         gameOverText = gameOverPanel.GetComponentInChildren<TMP_Text>();
@@ -44,7 +46,6 @@ public class GameManager : MonoBehaviour
     private int playerLastMaxTravel;
     private void Update()
     {
-        Debug.Log(player.MaxTravel+frontDistance);
         // cek player
         if(player.IsDie && gameOverPanel.activeInHierarchy==false)
             ShowGameOverPanel();
@@ -72,6 +73,7 @@ public class GameManager : MonoBehaviour
     {
         gameOverText.text = "Your Score: " + player.MaxTravel;
         gameOverPanel.SetActive(true);
+        FindObjectOfType<AudioManager>().PlayAudio("Win");
     }
 
     private void CreateTerrain(GameObject prefab, int zPos)
@@ -105,5 +107,16 @@ public class GameManager : MonoBehaviour
         }
         // penentuan terain block dengan probabilitas 50%
         return Random.value > 0.5f ? road : grass;
+    }
+
+    public void BackToMainMenu()
+    {
+        SceneLoader.Load("MainMenu");
+        FindObjectOfType<AudioManager>().StopAudio("CarAmbience");
+    }
+
+    public void Replay()
+    {
+        SceneLoader.ReloadLevel();
     }
 }

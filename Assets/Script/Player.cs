@@ -85,6 +85,8 @@ public class Player : MonoBehaviour
         // gerak maju/mundur/samping
         transform.DOMoveX(targetPosition.x, moveDuration);
         transform.DOMoveZ(targetPosition.z, moveDuration).OnComplete(UpdateTravel);
+
+        FindObjectOfType<AudioManager>().PlayAudio("Move");
     }
 
     private void UpdateTravel()
@@ -119,6 +121,8 @@ public class Player : MonoBehaviour
 
     private void AnimateCrash(Car car)
     {
+        FindObjectOfType<AudioManager>().PlayAudio("Dead");
+
         transform.DOScaleY(0.1f, 1);
         transform.DOScaleX(2, 1);
         transform.DOScaleZ(2, 1);
